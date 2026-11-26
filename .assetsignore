@@ -1,0 +1,15 @@
+# Filer der IKKE skal ligge offentligt på Cloudflare
+.git
+.wrangler
+node_modules
+cloudflare
+tools
+tests
+docs
+dist
+wrangler.jsonc
+package.json
+package-lock.json
+.assetsignore
+.gitignore
+*.md

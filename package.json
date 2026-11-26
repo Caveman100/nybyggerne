@@ -1,0 +1,18 @@
+{
+  "name": "nybyggerne",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Nybyggerne – et Catan-inspireret brætspil i browseren til at spille med venner.",
+  "type": "module",
+  "scripts": {
+    "start": "node tools/serve.js",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "node tests/simulate.js && node tests/bots.js",
+    "build:single": "node tools/build-single-file.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.2",
+    "wrangler": "^4.0.0"
+  }
+}

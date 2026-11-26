@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nybyggerne</title>
+<meta name="description" content="Nybyggerne – et middelalderligt brætspil om at bygge på en ø. Spil med venner direkte i browseren.">
+<link rel="icon" href="assets/images/favicon.svg">
+
+<!-- Udseende: rækkefølgen betyder noget, fordi senere filer kan overskrive tidligere -->
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/game.css">
+<link rel="stylesheet" href="css/rules.css">
+<link rel="stylesheet" href="css/start.css">
+<link rel="stylesheet" href="css/panels.css">
+
+<!-- Fortæller browseren, hvor 'three' ligger, når koden skriver import ... from 'three' -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.min.js",
+    "three/addons/": "./vendor/three/addons/"
+  }
+}
+</script>
+</head>
+<body class="in-start">
+
+<div id="stage">
+  <div id="loading">Bygger øen…</div>
+  <div id="codeTag" hidden></div>
+  <div id="diceSum" hidden></div>
+  <div id="timer" hidden></div>
+  <div id="turnBanner"></div>
+  <div id="eventBanner" class="parch"></div>
+  <div id="barbHud" hidden></div>
+  <div id="gainPop" class="parch"></div>
+  <div id="hint" hidden>Scroll eller knib for at zoome</div>
+  <div id="myHand" hidden></div>
+  <div id="oppHud" hidden></div>
+</div>
+
+<div id="hudLayer" hidden>
+  <div id="statusBar"><div id="status"></div><div id="localSwitch" hidden></div><div id="turnActions"></div></div>
+  <nav id="toolbar">
+    <button class="tool" data-cmd="panel" data-arg="trade" title="Handel">🤝<span>Handel</span><i class="dot" hidden></i></button>
+    <button class="tool" data-cmd="panel" data-arg="players" title="Spillere">👥<span>Spillere</span></button>
+    <button class="tool" data-cmd="panel" data-arg="log" title="Krønike">📜<span>Krønike</span></button>
+    <button class="tool" data-cmd="panel" data-arg="settings" title="Indstillinger">⚙️<span>Indstillinger</span></button>
+    <button class="tool" data-cmd="rules" title="Regelbog">📖<span>Regler</span></button>
+    <button class="tool" data-cmd="mute" id="muteBtn" title="Lyd til/fra">🔊<span>Lyd</span></button>
+  </nav>
+  <section class="win parch" id="win-trade" hidden><header>🤝 Handel<button class="x" data-cmd="panel" data-arg="trade">✕</button></header><div class="wb"><div id="tradeBox"></div></div></section>
+  <section class="win parch" id="win-players" hidden><header>👥 Spillere<button class="x" data-cmd="panel" data-arg="players">✕</button></header><div class="wb"><details class="lg"><summary>Hvad betyder tallene?</summary><div id="legend" class="legend"></div></details><div id="players"></div></div></section>
+  <section class="win parch" id="win-log" hidden><header>📜 Krønike<button class="x" data-cmd="panel" data-arg="log">✕</button></header><div class="wb"><div id="log"></div></div></section>
+  <section class="win parch" id="win-settings" hidden><header>⚙️ Indstillinger<button class="x" data-cmd="panel" data-arg="settings">✕</button></header><div class="wb"><div id="settingsBox"></div></div></section>
+  <div id="shop"><div id="actionBtn"></div><div id="buildBar"></div></div>
+</div>
+
+<div id="startScreen">
+  <div class="startBox">
+    <h1 class="title">Nybyggerne</h1>
+    <div class="subtitle">Byg, byt og bliv herre over øen · 2–4 spillere</div>
+    <div style="text-align:center;margin-bottom:4px"><button data-cmd="rules">📖 Regelbog</button></div>
+    <div id="startCards">
+      <div class="card parch">
+        <h2>Dit navn</h2>
+        <input id="nameInput" maxlength="20" placeholder="Fx Ragnhild" style="width:100%">
+      </div>
+      <div class="card parch">
+        <h2>Opret et spil</h2>
+        <p class="muted" style="margin:0 0 10px">Du bliver vært. Spillet kører i din browser, så hold fanen åben.</p>
+        <button class="primary" data-cmd="create">Opret nyt spil</button>
+        <div id="resumeBox" class="row" style="margin-top:10px" hidden></div>
+      </div>
+      <div class="card parch">
+        <h2>Deltag i et spil</h2>
+        <div class="row">
+          <input id="codeInput" maxlength="4" placeholder="Kode" style="text-transform:uppercase; letter-spacing:4px; font-family:Cinzel,serif; font-weight:700">
+          <button class="primary" data-cmd="join">Deltag</button>
+        </div>
+      </div>
+      <div class="card parch">
+        <h2>Prøv lokalt – alle ved én skærm</h2>
+        <div class="row">
+          <input id="localNames" value="Ragnhild, Bjørn, Sigrid">
+          <button data-cmd="local">Start</button>
+        </div>
+        <div class="muted" style="font-size:14px;margin-top:6px;font-style:italic">Navne adskilt med komma (1–4 inkl. botter).</div>
+        <div class="row" style="margin-top:8px"><span class="cz" style="font-size:14px">🤖 Botter:</span><select id="localBots"><option value="0">Ingen</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select> <select id="localBotLevel" title="Bottens sværhedsgrad"><option value="easy">Let</option><option value="normal">Normal</option><option value="hard" selected>Svær</option></select></div>
+        <div style="margin-top:8px"><div class="exps"><span class="cz" style="font-size:14px">Udvidelser:</span>
+        <label><input type="checkbox" data-exp-local="events"> Begivenhedskort</label>
+        <label><input type="checkbox" data-exp-local="barbarians"> Riddere og barbarer</label>
+        <label><input type="checkbox" data-exp-local="seafarers"> Søfarere</label></div></div>
+        <div class="row" style="margin-top:8px"><span class="cz" style="font-size:14px">Tid pr. tur:</span><select id="localTime"><option value="0">Ingen grænse</option><option value="30">30 sekunder</option><option value="60">1 minut</option><option value="90">1½ minut</option><option value="120">2 minutter</option><option value="180">3 minutter</option><option value="300">5 minutter</option></select></div>
+        <div id="resumeLocalBox" style="margin-top:8px" hidden></div>
+      </div>
+    </div>
+    <div id="lobbyCard" class="card parch" hidden>
+      <h2>Lobby</h2>
+      <div class="muted">Spilkode – send den til dine venner:</div>
+      <div class="code" id="lobbyCode">····</div>
+      <div id="lobbyLink" class="muted" style="font-size:14px;word-break:break-all"></div>
+      <ul class="lobbyList" id="lobbyList"></ul>
+      <div class="row" id="timeRow" hidden><span class="cz" style="font-size:14px">Tid pr. tur:</span><select id="timeSelect"><option value="0">Ingen grænse</option><option value="30">30 sekunder</option><option value="60">1 minut</option><option value="90">1½ minut</option><option value="120">2 minutter</option><option value="180">3 minutter</option><option value="300">5 minutter</option></select></div>
+      <div id="expRow" hidden><div class="exps"><span class="cz" style="font-size:14px">Udvidelser:</span>
+        <label><input type="checkbox" data-exp-host="events"> Begivenhedskort</label>
+        <label><input type="checkbox" data-exp-host="barbarians"> Riddere og barbarer</label>
+        <label><input type="checkbox" data-exp-host="seafarers"> Søfarere</label></div></div>
+      <div id="timeInfo" class="muted" hidden></div>
+      <div id="lobbyStatus" class="muted" style="font-style:italic"></div>
+      <div class="row" style="margin-top:10px">
+        <button class="primary" id="startBtn" data-cmd="start" hidden>Start spillet</button>
+        <span id="addBotBox" hidden><button data-cmd="addBot" title="Tilføj en computerspiller">🤖 Tilføj bot</button> <select id="botLevel" title="Bottens sværhedsgrad"><option value="easy">Let</option><option value="normal">Normal</option><option value="hard" selected>Svær</option></select></span>
+        <button data-cmd="leave">Tilbage</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="rules" hidden><div class="book parch"><header><span>📖 Regelbog</span><button class="x" data-cmd="rules">✕</button></header>
+  <nav class="tabs" id="rulesTabs"></nav><div class="page" id="rulesPage"></div></div></div>
+<div id="modal" hidden></div>
+<div id="toast" hidden></div>
+<div id="banner" hidden></div>
+
+<!-- PeerJS: forbinder spillernes browsere direkte med hinanden (ingen egen server) -->
+<script src="vendor/peerjs.min.js"></script>
+<!-- Selve spillet. Starter i js/main.js -->
+<script type="module" src="js/main.js"></script>
+<script>
+  // Åbnet direkte som fil? Så kan browseren ikke indlæse modulerne – forklar hvad man skal gøre.
+  if (location.protocol === 'file:') document.getElementById('loading').innerHTML =
+    'Spillet skal åbnes via en webserver.<br><small>Brug GitHub Pages-linket, eller kør <code>node tools/serve.js</code> – se README.md</small>';
+</script>
+</body>
+</html>

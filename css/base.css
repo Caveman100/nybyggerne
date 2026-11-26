@@ -1,0 +1,32 @@
+/* Nybyggerne – Grundlag: skrifttyper, farver (variabler i :root), knapper, felter og pergament-baggrund.
+   Vil du ændre farvetemaet, så start med variablerne i :root. */
+
+/* Skrifttyper (OFL-licens, se assets/fonts/) */
+@font-face { font-family: 'Cinzel'; font-weight: 700; src: url(../assets/fonts/cinzel-700.woff2) format('woff2'); font-display: block; }
+@font-face { font-family: 'Fell'; font-weight: 400; src: url(../assets/fonts/im-fell-english-400.woff2) format('woff2'); }
+@font-face { font-family: 'Fell'; font-weight: 400; font-style: italic; src: url(../assets/fonts/im-fell-english-400-italic.woff2) format('woff2'); }
+
+:root {
+  --parch: #f3e6c8; --parch2: #e8d4a8; --ink: #2d2116; --muted: #6e5a40; --line: #c9ad7a;
+  --wood: #5b3a1e; --wood2: #7a5230; --gold: #c9a24a; --wax: #8f2a1e; --wax2: #6e1d14; --ok: #3d6b34;
+  --paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .12 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { font-family: 'Fell', Georgia, serif; font-size: 17px; color: var(--ink); background: #1e2a33; overflow-x: hidden; }
+h1, h2, h3, .cz { font-family: 'Cinzel', Georgia, serif; font-weight: 700; }
+[hidden] { display: none !important; }
+
+button { font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 14px; letter-spacing: .02em; cursor: pointer; color: #fbeccb;
+  background: linear-gradient(180deg, #8a5c33, #5b3a1e); border: 1px solid #3a230f; border-radius: 9px; padding: 9px 12px;
+  box-shadow: inset 0 1px 0 rgba(255,230,180,.35), 0 2px 0 #2c1a0b, 0 3px 6px rgba(0,0,0,.25); text-shadow: 0 1px 0 rgba(0,0,0,.5); transition: transform .08s, filter .15s; }
+button:hover:not(:disabled) { filter: brightness(1.12); }
+button:active:not(:disabled) { transform: translateY(1px); box-shadow: inset 0 1px 0 rgba(255,230,180,.25), 0 1px 0 #2c1a0b; }
+button:disabled { opacity: .42; cursor: default; filter: grayscale(.4); }
+button.primary { background: linear-gradient(180deg, #a83a2a, var(--wax2)); border-color: #4a120b; }
+button.on { background: linear-gradient(180deg, #e2b85a, #a67b25); color: #2d2116; text-shadow: none; border-color: #6b4a14; }
+button.small { padding: 3px 9px; font-size: 13px; }
+input, select { font-family: 'Fell', Georgia, serif; font-size: 17px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fffaf0; color: var(--ink); }
+input:focus, select:focus, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+.muted { color: var(--muted); }
+.parch { background: var(--paper), radial-gradient(ellipse at 30% 20%, #faf0d8, var(--parch) 60%, var(--parch2)); }

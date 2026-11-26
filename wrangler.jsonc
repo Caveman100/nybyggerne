@@ -1,0 +1,17 @@
+// Opsætning til Cloudflare Workers (se docs/CLOUDFLARE.md).
+// Spillets filer serveres som statiske filer, og cloudflare/worker.js håndterer /relay/*.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "nybyggerne",
+  "main": "cloudflare/worker.js",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "run_worker_first": ["/relay/*"]
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "ROOMS", "class_name": "Room" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }]
+}
