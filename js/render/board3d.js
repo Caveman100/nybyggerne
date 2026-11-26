@@ -5,7 +5,7 @@
 // blandes ind i Board3D nederst i denne fil. Så kan alle dele kalde hinanden med this.
 //
 //   board3d.js  – opsætning, opdatering, klik på brættet, tegne-løkke (denne fil)
-//   tavern.js   – træbord, stearinlys, ildskær og hav
+//   tavern.js   – træbord, ildskær og hav
 //   tiles.js    – sekskantfelter og nummerbrikker
 //   harbors.js  – havne
 //   pieces.js   – veje, skibe, huse, byer, riddere, røver
@@ -131,6 +131,7 @@ export class Board3D {
       this.sheep = [];
       this.smokers = [];
       this._buildBoard(s);
+      this._fitRim();
       this.synced = false;
       this.lastRoll = null;
       this._introCamera();
@@ -337,24 +338,54 @@ export class Board3D {
     });
   }
 
+  // Gør havet og rammen kun så store, som øen (inkl. havne) kræver – så er der mindre vand.
+  // Havet er en sekskant: for hver af dens 6 sider måler vi, hvor langt øen rækker ud mod den.
+  _fitRim() {
+    const pts = [];
+    this.boardGroup.updateMatrixWorld(true);
+    this.boardGroup.traverse(o => {
+      if (!o.isMesh || !o.geometry) return;
+      o.geometry.computeBoundingBox();
+      const b = o.geometry.boundingBox;
+      [[b.min.x, b.min.y, b.min.z], [b.max.x, b.max.y, b.max.z], [b.min.x, b.max.y, b.max.z], [b.max.x, b.min.y, b.min.z],
+       [b.min.x, b.min.y, b.max.z], [b.max.x, b.max.y, b.min.z], [b.min.x, b.max.y, b.min.z], [b.max.x, b.min.y, b.max.z]]
+        .forEach(([x, y, z]) => { const v = new THREE.Vector3(x, y, z).applyMatrix4(o.matrixWorld); pts.push(v); });
+    });
+    let need = 0;
+    for (let k = 0; k < 6; k++) {
+      const a = Math.PI / 6 + k * Math.PI / 3, nx = Math.cos(a), nz = Math.sin(a);   // sidernes retning
+      pts.forEach(p => { need = Math.max(need, p.x * nx + p.z * nz); });
+    }
+    const inner = 7.48 * Math.cos(Math.PI / 6);            // havets oprindelige afstand til siderne
+    this.rimScale = Math.min(1, (need + 0.25) / inner);
+    const k = this.rimScale, [frame, trim, sea] = this.rim;
+    frame.scale.set(k, 1, k);   // cylinder står op
+    trim.scale.set(k, k, 1);    // torus og hav ligger ned (drejet om x-aksen)
+    sea.scale.set(k, k, 1);
+    this._resize();
+  }
+
   _resize() {
     const w = this.container.clientWidth, h = this.container.clientHeight;
     if (!w || !h) return;
     this.renderer.setSize(w, h, false);
     this.renderer.domElement.style.width = w + 'px';
     this.renderer.domElement.style.height = h + 'px';
-    const narrow = w / h < 1, W = narrow ? 7.7 : 7.85, H = 6.75;
+    // Kameraet viser rammen og lidt bord. ZOOM: mindre tal = tættere på brættet fra start.
+    const ZOOM = 1.04, f = (this.rimScale || 1) * ZOOM;
+    const narrow = w / h < 1, W = (narrow ? 7.7 : 7.85) * f, H = 6.75 * f;
     let hw, hh;
     if (w / h > W / H) { hh = H; hw = H * w / h; } else { hw = W; hh = W * h / w; }
     Object.assign(this.camera, { left: -hw, right: hw, top: hh, bottom: -hh });
     this.camera.updateProjectionMatrix();
     this.size = { w, h };
+    if (this._placeDiceTray) this._placeDiceTray();
   }
 
   diceRect() {
     if (!this.size) return null;
     const { w, h } = this.size;
-    const dw = Math.round(Math.min(230, Math.max(120, w * 0.26))), dh = Math.round(dw * 0.66);
+    const dw = Math.round(Math.min(180, Math.max(118, w * 0.16))), dh = Math.round(dw * 0.62);
     if (w / h < 1) return { x: w - dw - 8, y: 8, w: dw, h: dh, below: true };
     return { x: w - dw - 10, y: 10, w: dw, h: dh, below: true };
   }
@@ -372,7 +403,6 @@ export class Board3D {
     this.controls.update();
     if (this.seaUniforms) this.seaUniforms.uTime.value = time;
     if (this.flicker) this.flicker.forEach(f => { const n = Math.sin(time * 7.3 + f.ph) * 0.5 + Math.sin(time * 13.1 + f.ph * 2) * 0.3 + Math.sin(time * 2.1 + f.ph) * 0.2; f.l.intensity = f.base * (1 + n * f.amt); });
-    if (this.candles) this.candles.forEach(c => { const n = Math.sin(time * 9 + c.ph) * 0.06 + Math.sin(time * 17 + c.ph) * 0.04; c.flame.scale.set(0.22 * (1 - n), 0.42 * (1 + n * 1.5), 1); c.halo.material.opacity = 0.3 + n; });
     if (this.smokers) this.smokers.forEach(sm => { sm.next -= dt; if (sm.next <= 0) { sm.next = 0.45 + Math.random() * 0.3; this._puff(sm); } });
     if (this.sheep) this.sheep.forEach(sh => { const p = sh.userData.phase + time; if (sh.userData.head) sh.userData.head.position.y = 0.13 - Math.max(0, Math.sin(p * 0.7)) * 0.07; });
     if (this.robber) this.robber.children[0] && (this.robber.position.y = this.anims.length ? this.robber.position.y : Math.abs(Math.sin(time * 2)) * 0.03);
@@ -392,19 +422,6 @@ export class Board3D {
     r.setViewport(0, 0, this.size.w, this.size.h);
     r.clear();
     r.render(this.scene, this.camera);
-    const d = this.diceRect();
-    if (d && this.diceScene) {
-      const y = this.size.h - d.y - d.h;
-      r.clearDepth();
-      r.setScissorTest(true);
-      r.setScissor(d.x, y, d.w, d.h);
-      r.setViewport(d.x, y, d.w, d.h);
-      const dh = 1.62, dw = Math.max(2.45, dh * d.w / d.h);
-      Object.assign(this.diceCam, { left: -dw, right: dw, top: Math.max(dh, dw * d.h / d.w), bottom: -Math.max(dh, dw * d.h / d.w) });
-      this.diceCam.updateProjectionMatrix();
-      r.render(this.diceScene, this.diceCam);
-      r.setScissorTest(false);
-    }
   }
 }
 

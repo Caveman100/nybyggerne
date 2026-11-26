@@ -1,3 +1,4 @@
+import { MUSIC_FILE } from './assets.js';
 // Nybyggerne – syntetiske lydeffekter (Web Audio, ingen lydfiler)
 let ac = null, master = null, sfx = null, amb = null, noiseBuf = null, ambientStarted = false, birdTimer = null;
 let muted = false;
@@ -99,11 +100,21 @@ function startAmbient() {
   birdTimer = setTimeout(crackle, 500);
 }
 
+// Baggrundsmusik: "The Old Tower Inn" (assets/audio). Starter ved første klik (browsere kræver det)
+// og følger lyd-knappen. Ret MUSIC_VOLUME for at gøre den højere eller lavere.
+const MUSIC_VOLUME = 0.3;
+let music = null;
+function startMusic() {
+  if (!music) { music = new Audio(MUSIC_FILE); music.loop = true; music.volume = MUSIC_VOLUME; }
+  if (!muted && music.paused) music.play().catch(() => {});
+}
+
 export const Sound = {
   get muted() { return muted; },
-  unlock() { try { ctx(); startAmbient(); } catch (e) {} },
+  unlock() { try { ctx(); startAmbient(); } catch (e) {} startMusic(); },
   setMuted(m) {
     muted = m;
+    if (music) { if (m) music.pause(); else music.play().catch(() => {}); }
     try { localStorage.setItem('nyb-muted', m ? '1' : '0'); } catch (e) {}
     if (master) master.gain.setTargetAtTime(m ? 0 : 0.9, ac.currentTime, 0.05);
   },

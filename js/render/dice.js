@@ -1,86 +1,88 @@
-// Nybyggerne – 3D-brættet: Terningerne i bakken øverst til højre (egen lille scene og kamera).
+// Nybyggerne – terningerne.
+// Terningerne er almindelige HTML-elementer (CSS 3D), ikke en del af Three.js-scenen:
+// ved et slag kastes to elfenbensterninger hen over bordet, triller, hopper og lander midt
+// på skærmen. Derefter glider de ned i bakken øverst til højre. Udseendet står i css/dice.css.
 // Metoderne blandes ind i Board3D (se board3d.js), så `this` er selve brættet.
-import * as THREE from 'three';
-import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { ease } from './constants.js';
+
+// Rotation der vender en bestemt side op mod spilleren
+const SHOW = { 1: [0, 0], 6: [0, 180], 2: [0, -90], 5: [0, 90], 3: [-90, 0], 4: [90, 0] };
+// Hvor prikkerne sidder i et 3×3-gitter
+const PIPS = { 1: [5], 2: [1, 9], 3: [1, 5, 9], 4: [1, 3, 7, 9], 5: [1, 3, 5, 7, 9], 6: [1, 3, 4, 6, 7, 9] };
+const FACES = { 1: 'front', 6: 'back', 2: 'right', 5: 'left', 3: 'top', 4: 'bottom' };
+
+function makeDie() {
+  const wrap = document.createElement('div'); wrap.className = 'die-wrap';
+  const cube = document.createElement('div'); cube.className = 'die';
+  for (const n of [1, 2, 3, 4, 5, 6]) {
+    const f = document.createElement('div'); f.className = `face ${FACES[n]}${n === 1 ? ' one' : ''}`;
+    for (let k = 1; k <= 9; k++) { const p = document.createElement('i'); if (PIPS[n].includes(k)) p.className = 'pip'; f.appendChild(p); }
+    cube.appendChild(f);
+  }
+  const shadow = document.createElement('div'); shadow.className = 'die-shadow';
+  wrap.append(shadow, cube);
+  return { wrap, cube, shadow };
+}
+const rot = (n, twist = 0) => `rotateZ(${twist}deg) rotateX(${SHOW[n][0]}deg) rotateY(${SHOW[n][1]}deg)`;
 
 export class DiceParts {
   _buildDice() {
-    const ds = (this.diceScene = new THREE.Scene());
-    this.diceCam = new THREE.OrthographicCamera(-2.45, 2.45, 1.62, -1.62, 0.1, 50);
-    this.diceCam.position.set(0, 10, 0.001);
-    this.diceCam.lookAt(0, 0, 0);
-    ds.add(new THREE.HemisphereLight('#fff4e0', '#5a4630', 1.4));
-    const l = new THREE.DirectionalLight('#ffe6c0', 2.4);
-    l.position.set(-3, 7, 4); l.castShadow = true;
-    l.shadow.mapSize.set(512, 512);
-    Object.assign(l.shadow.camera, { left: -4, right: 4, top: 4, bottom: -4 });
-    ds.add(l);
-    // Bakke i træ med filt
-    const wood = new THREE.MeshStandardMaterial({ color: '#6b4325', roughness: 0.75 });
-    const felt = new THREE.MeshStandardMaterial({ color: '#2f5a3a', roughness: 1 });
-    const W = 4.2, D = 2.6;
-    const floor = new THREE.Mesh(new RoundedBoxGeometry(W, 0.2, D, 2, 0.08), felt);
-    floor.position.y = -0.1; floor.receiveShadow = true; ds.add(floor);
-    const rim = (w, d, x, z) => { const m = new THREE.Mesh(new RoundedBoxGeometry(w, 0.45, d, 2, 0.08), wood); m.position.set(x, 0.05, z); m.castShadow = m.receiveShadow = true; ds.add(m); };
-    rim(W + 0.4, 0.22, 0, -D / 2 - 0.1); rim(W + 0.4, 0.22, 0, D / 2 + 0.1);
-    rim(0.22, D, -W / 2 - 0.1, 0); rim(0.22, D, W / 2 + 0.1, 0);
-
-    const faceTex = n => {
-      const c = document.createElement('canvas'); c.width = c.height = 128;
-      const x = c.getContext('2d');
-      x.fillStyle = '#f4ead4'; x.fillRect(0, 0, 128, 128);
-      const gr = x.createRadialGradient(64, 64, 20, 64, 64, 90); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(160,130,90,.35)');
-      x.fillStyle = gr; x.fillRect(0, 0, 128, 128);
-      const P = { 1: [[64, 64]], 2: [[36, 36], [92, 92]], 3: [[34, 34], [64, 64], [94, 94]], 4: [[36, 36], [92, 36], [36, 92], [92, 92]], 5: [[34, 34], [94, 34], [64, 64], [34, 94], [94, 94]], 6: [[36, 30], [92, 30], [36, 64], [92, 64], [36, 98], [92, 98]] }[n];
-      x.fillStyle = n === 1 ? '#9b1c1c' : '#2a1d14';
-      P.forEach(([px, py]) => { x.beginPath(); x.arc(px, py, n === 1 ? 15 : 11, 0, Math.PI * 2); x.fill(); });
-      const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
-    };
-    // BoxGeometry-rækkefølge: +x, -x, +y, -y, +z, -z
-    const order = [3, 4, 1, 6, 2, 5];
-    const mats = order.map(n => new THREE.MeshStandardMaterial({ map: faceTex(n), roughness: 0.45 }));
-    const geo = new RoundedBoxGeometry(0.62, 0.62, 0.62, 4, 0.1);
-    this.dice = [0, 1].map(i => {
-      const m = new THREE.Mesh(geo, mats);
-      m.castShadow = true;
-      m.position.set(i ? 0.55 : -0.55, 0.31, 0.1);
-      ds.add(m);
-      return m;
-    });
-    const X = new THREE.Vector3(1, 0, 0), Z = new THREE.Vector3(0, 0, 1);
-    this.faceQ = {
-      1: new THREE.Quaternion(),
-      6: new THREE.Quaternion().setFromAxisAngle(X, Math.PI),
-      2: new THREE.Quaternion().setFromAxisAngle(X, -Math.PI / 2),
-      5: new THREE.Quaternion().setFromAxisAngle(X, Math.PI / 2),
-      3: new THREE.Quaternion().setFromAxisAngle(Z, Math.PI / 2),
-      4: new THREE.Quaternion().setFromAxisAngle(Z, -Math.PI / 2),
-    };
+    // Bakken øverst til højre
+    this.tray = document.createElement('div'); this.tray.className = 'dice-tray';
+    this.trayDice = [makeDie(), makeDie()];
+    this.trayDice.forEach(d => this.tray.appendChild(d.wrap));
+    // Kastet midt på skærmen
+    this.throwLayer = document.createElement('div'); this.throwLayer.className = 'dice-throw'; this.throwLayer.hidden = true;
+    this.throwDice = [makeDie(), makeDie()];
+    this.throwDice.forEach(d => this.throwLayer.appendChild(d.wrap));
+    this.container.append(this.tray, this.throwLayer);
+    this._placeDiceTray();
     this.setDice([3, 4], false);
   }
 
+  _placeDiceTray() {
+    const r = this.diceRect(); if (!r || !this.tray) return;
+    Object.assign(this.tray.style, { left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px' });
+    this.tray.style.setProperty('--ds', Math.round(r.h * 0.42) + 'px');
+  }
+
   setDice(vals, animate) {
-    const Y = new THREE.Vector3(0, 1, 0);
     const R = Math.random;
-    this.dice.forEach((m, i) => {
-      const finalQ = new THREE.Quaternion().setFromAxisAngle(Y, (R() - 0.5) * 0.9).multiply(this.faceQ[vals[i]]);
-      const endPos = new THREE.Vector3(i ? 0.6 + R() * 0.3 : -0.6 - R() * 0.3, 0.31, (R() - 0.5) * 0.6);
-      if (!animate) { m.quaternion.copy(finalQ); m.position.copy(endPos); return; }
-      const startPos = new THREE.Vector3(-2.4 + i * 0.4, 2.6, 1.6 - i * 0.5);
-      const axis = new THREE.Vector3(R() - 0.5, R() - 0.5, R() - 0.5).normalize();
-      const spin = (3 + R() * 2) * Math.PI * 2;
-      const tmp = new THREE.Quaternion();
-      this._anim(1.35 + i * 0.12, t => {
-        const e = ease.outCubic(t);
-        m.position.x = THREE.MathUtils.lerp(startPos.x, endPos.x, e);
-        m.position.z = THREE.MathUtils.lerp(startPos.z, endPos.z, e);
-        m.position.y = endPos.y + (startPos.y - endPos.y) * Math.abs(Math.cos(t * Math.PI * 2.5)) * Math.pow(1 - t, 2);
-        tmp.setFromAxisAngle(axis, spin * Math.pow(1 - t, 2.2));
-        m.quaternion.copy(finalQ).multiply(tmp);
-      }, () => { if (i === 1) this._diceLanded(vals); });
+    const showInTray = () => this.trayDice.forEach((d, i) => { d.cube.style.transform = rot(vals[i], (R() - 0.5) * 30); });
+    if (!animate) { showInTray(); this.onDiceDone(vals); return; }
+
+    const { w, h } = this.size;
+    const size = Math.round(Math.min(110, Math.max(64, Math.min(w, h) * 0.11)));
+    this.throwLayer.style.setProperty('--ds', size + 'px');
+    this.throwLayer.classList.remove('fade'); this.throwLayer.hidden = false;
+    const cx = w / 2, cy = h * 0.46, from = R() < 0.5 ? -1 : 1;   // kastes ind fra venstre eller højre
+    let landed = 0;
+    this.throwDice.forEach((d, i) => {
+      const endX = cx + (i ? 0.75 : -0.75) * size + (R() - 0.5) * size * 0.4 - size / 2;
+      const endY = cy + (R() - 0.5) * size * 0.5 - size / 2;
+      const startX = from < 0 ? -size * 2 : w + size, startY = h * (0.75 + R() * 0.15);
+      const twist = (R() - 0.5) * 50, sx = (R() < 0.5 ? -1 : 1) * 360 * (2 + Math.floor(R() * 2)), sy = (R() < 0.5 ? -1 : 1) * 360 * (1 + Math.floor(R() * 2));
+      const [fx, fy] = SHOW[vals[i]];
+      const dur = 1250 + i * 120;
+      // Banen: tre hop, der bliver lavere og lavere
+      const path = [[0, 1, 0], [0.38, 0.32, 1.35], [0.55, 0.12, 1], [0.7, 0.06, 1.12], [0.82, 0.02, 1], [0.9, 0.005, 1.04], [1, 0, 1]];
+      d.wrap.animate(path.map(([o, k, sc]) => ({ offset: o, transform: `translate(${startX + (endX - startX) * (1 - k)}px, ${startY + (endY - startY) * (1 - k)}px) scale(${sc})` })),
+        { duration: dur, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' });
+      d.shadow.animate([{ opacity: 0.15, transform: 'translate(18px, 26px) scale(1.3)' }, { offset: 0.38, opacity: 0.1, transform: 'translate(40px, 50px) scale(1.6)' }, { opacity: 0.55, transform: 'translate(6px, 8px) scale(1)' }],
+        { duration: dur, easing: 'ease-out', fill: 'forwards' });
+      d.cube.animate([
+        { transform: `rotateZ(${twist + 200}deg) rotateX(${fx + sx}deg) rotateY(${fy + sy}deg)` },
+        { offset: 0.55, transform: `rotateZ(${twist + 30}deg) rotateX(${fx + sx * 0.18}deg) rotateY(${fy + sy * 0.15}deg)` },
+        { transform: `rotateZ(${twist}deg) rotateX(${fx}deg) rotateY(${fy}deg)` },
+      ], { duration: dur, easing: 'cubic-bezier(.15,.6,.25,1)', fill: 'forwards' }).onfinish = () => {
+        if (++landed < 2) return;
+        showInTray();
+        this._diceLanded(vals);
+        // lad dem ligge et øjeblik, og lad dem så forsvinde
+        clearTimeout(this._diceFade);
+        this._diceFade = setTimeout(() => { this.throwLayer.classList.add('fade'); this._diceFade = setTimeout(() => (this.throwLayer.hidden = true), 450); }, 1100);
+      };
     });
-    if (animate) this._sound('dice'); else this.onDiceDone(vals);
+    this._sound('dice');
   }
 
   _diceLanded(vals) {

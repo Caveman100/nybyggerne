@@ -30,6 +30,7 @@ export const CARD_IMAGES = {
 
 export const ROBBER_IMAGE = inline(IMG + 'robber.webp');
 export const SEA_IMAGE = inline(IMG + 'sea.webp');
+export const MUSIC_FILE = inline('assets/audio/the-old-tower-inn.mp3'); // baggrundsmusik
 export const TABLE_IMAGE = inline(IMG + 'table.webp'); // bordpladen (sømløs, gentages)
 
 // Havnebillederne. Hver råstofhavn har sit eget motiv, og 3:1-havnene skiftes mellem dem.

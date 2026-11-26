@@ -96,7 +96,7 @@ Reglerne ændrer aldrig skærmen direkte, og skærmen ændrer aldrig tilstanden 
 | Fil | Indhold |
 |---|---|
 | `board3d.js` | Opsætning (kamera, lys, indlæsning), `update()` som synkroniserer brikkerne med tilstanden, klik og tegne-løkken |
-| `tavern.js` | Træbordet, stearinlys, ildskær og det malede hav |
+| `tavern.js` | Træbordet, ildskær og det malede hav |
 | `tiles.js` | Sekskantfelterne med malerier og nummerbrikkerne |
 | `harbors.js` | Havnene og deres skilte (2:1 / 3:1) |
 | `pieces.js` | Veje, skibe, huse, byer, riddere og røveren |

@@ -12,7 +12,7 @@ import * as esbuild from 'esbuild';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const rel = p => path.join(ROOT, p);
-const MIME = { '.webp': 'image/webp', '.png': 'image/png', '.svg': 'image/svg+xml', '.gltf': 'model/gltf+json', '.bin': 'application/octet-stream', '.woff2': 'font/woff2' };
+const MIME = { '.webp': 'image/webp', '.png': 'image/png', '.svg': 'image/svg+xml', '.gltf': 'model/gltf+json', '.bin': 'application/octet-stream', '.woff2': 'font/woff2', '.mp3': 'audio/mpeg' };
 const dataUri = file => `data:${MIME[path.extname(file)]};base64,${fs.readFileSync(file).toString('base64')}`;
 
 // 1) Alle billeder og modeller som data-URI'er, slået op efter deres sti
@@ -32,7 +32,7 @@ const result = await esbuild.build({
 const safe = s => s.replace(/<\/script/gi, '<\\/script');
 
 // 3) CSS med skrifttyper indbygget
-const css = ['base', 'game', 'rules', 'start', 'panels'].map(n => fs.readFileSync(rel(`css/${n}.css`), 'utf8')).join('\n')
+const css = ['base', 'game', 'rules', 'start', 'panels', 'dice'].map(n => fs.readFileSync(rel(`css/${n}.css`), 'utf8')).join('\n')
   .replace(/url\(\.\.\/(assets\/fonts\/[^)]+)\)/g, (_, p) => `url(${dataUri(rel(p))})`);
 
 // 4) Sæt det hele ind i index.html

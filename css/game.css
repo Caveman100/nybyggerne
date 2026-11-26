@@ -96,6 +96,8 @@
   #statusBar { left: 10px; top: 46px; transform: none; align-items: flex-start; max-width: clamp(200px, calc(50vw - 420px), 330px); }
   #status { text-align: left; border-radius: 14px; padding: 8px 14px; }
   #turnActions { justify-content: flex-start; }
+  /* Modspillerne står også i venstre kolonne, så de ikke dækker brættet */
+  #oppHud { left: 10px; transform: none; flex-direction: column; align-items: flex-start; gap: 6px; }
 }
 #turnActions:empty, #localSwitch:empty { display: none; }
 #turnActions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }

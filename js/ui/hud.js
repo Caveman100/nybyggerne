@@ -109,15 +109,16 @@ setInterval(() => {
   if (who.includes(app.me) && left <= 5 && left > 0 && left !== app.lastTick) { app.lastTick = left; Sound.play('tick'); }
 }, 250);
 
-// Venstre kolonne: kode → timer → statusboks → barbarer, stablet uden overlap
+// Venstre kolonne: kode → timer → statusboks → modspillere → barbarer, stablet uden overlap
 export function layoutLeft() {
   const wide = window.innerWidth > 860;
-  const sb = $('statusBar'), tm = $('timer'), bb = $('barbHud'), ct = $('codeTag');
-  if (!wide) { [sb, tm, bb].forEach(e => e.style.top = ''); return; }
+  const sb = $('statusBar'), tm = $('timer'), oh = $('oppHud'), bb = $('barbHud'), ct = $('codeTag');
+  if (!wide) { [sb, tm, oh, bb].forEach(e => e.style.top = ''); return; }
   let y = ct.hidden ? 10 : ct.offsetTop + ct.offsetHeight + 8;
   if (!tm.hidden) { tm.style.top = y + 'px'; y += tm.offsetHeight + 8; }
   sb.style.top = y + 'px';
-  if (!$('hudLayer').hidden) y += sb.offsetHeight + 10;
+  if (!$('hudLayer').hidden) y += sb.offsetHeight + 12;
+  if (!oh.hidden) { oh.style.top = y + 'px'; y += oh.offsetHeight + 10; }
   bb.style.top = y + 'px';
 }
 setInterval(layoutLeft, 200);
