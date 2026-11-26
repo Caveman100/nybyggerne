@@ -5,6 +5,9 @@ import { K } from './constants.js';
 import { paintPasture } from './textures.js';
 import { TILE_IMAGES } from '../assets.js';
 
+// Farvefilter på felterne (ganges på maleriet). Hvid = ingen ændring.
+const TERRAIN_TINT = { forest: '#9fd58f', hills: '#ffab8a', pasture: '#d6ff9e', fields: '#ffe680', mountains: '#c3cfe0', gold: '#fff0a0', desert: '#ffffff' };
+
 export class TileParts {
   _buildBoard(s) {
     if (this.boardGroup) { this.scene.remove(this.boardGroup); }
@@ -87,7 +90,9 @@ export class TileParts {
     else tex = new THREE.CanvasTexture(paintPasture());
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
-    const m = new THREE.MeshStandardMaterial({ map: tex, roughness: 1, emissive: '#ffffff', emissiveMap: tex, emissiveIntensity: 0.32 });
+    // Farvefilter pr. råstof, så felterne er lette at kende fra hinanden (som i originalspillet)
+    const tint = TERRAIN_TINT[terrain] || '#ffffff';
+    const m = new THREE.MeshStandardMaterial({ map: tex, color: tint, roughness: 1, emissive: tint, emissiveMap: tex, emissiveIntensity: 0.34 });
     return (this._tmats[terrain] = m);
   }
 

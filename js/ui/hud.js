@@ -43,13 +43,21 @@ export function renderHud(s) {
     }).join('');
     mh.innerHTML = `<div class="hl">Dine kort</div><div class="row2">${RES.map(k => `<div class="hc res-${k} ${p.res[k] ? '' : 'zero'}" title="${G.RES_DA[k]}"><img src="${CARD_IMAGES[k]}" alt=""><span class="nm">${G.RES_DA[k]}</span><span class="cnt">${p.res[k]}</span></div>`).join('')}${devHtml ? '<div class="hsep"></div>' + devHtml : ''}</div>`;
   }
-  const others = [];
-  for (let k = 1; k < s.players.length; k++) others.push((me + k) % s.players.length);
-  oh.innerHTML = others.map(i => {
+  // Alle spillere (dig først) med point, Længste vej og Største hær – altid synligt
+  const order = [];
+  for (let k = 0; k < s.players.length; k++) order.push((me + k) % s.players.length);
+  oh.innerHTML = order.map(i => {
     const o = s.players[i], n = G.countRes(o.res), d = o.dev.length;
     const fan = (cnt, cls) => { const show = Math.min(cnt, 7); return `<div class="fan ${cls}" style="width:${28 + Math.max(0, show - 1) * 7}px">${Array.from({ length: show }, (_, j) => `<i style="left:${j * 7}px;transform:rotate(${(j - (show - 1) / 2) * 4}deg)"></i>`).join('')}<b>${cnt}</b></div>`; };
+    const vp = i === me ? G.totalVP(s, i) : G.publicVP(s, i);           // andres skjulte sejrspointkort tælles ikke med
+    const road = (s.roadLengths && s.roadLengths[i]) || 0;
+    const badges = `<div class="badges">
+        <span class="vpb" title="Sejrspoint (først til ${s.winVP})">⭐ ${vp}<small>/${s.winVP}</small></span>
+        <span class="rb ${s.longestRoad === i ? 'own' : ''}" title="${s.longestRoad === i ? 'Har Længste vej (+2 point)' : 'Længste vej: ' + road}">🛣️ ${road}</span>
+        ${o.knights || s.largestArmy === i ? `<span class="rb ${s.largestArmy === i ? 'own' : ''}" title="${s.largestArmy === i ? 'Har Største hær (+2 point)' : 'Riddere spillet'}">⚔️ ${o.knights}</span>` : ''}</div>`;
+    if (i === me) return `<div class="opp me ${s.turn === i ? 'turn' : ''}"><div class="who"><span class="shield" style="background:${o.color}"></span>${esc(o.name)} <span class="muted2">(dig)</span></div>${badges}</div>`;
     return `<div class="opp ${s.turn === i ? 'turn' : ''}" data-opp="${i}"><div class="who"><span class="shield" style="background:${o.color}"></span>${esc(o.name)}</div>
-      ${n ? fan(n, '') : '<span class="kn">0 kort</span>'}${d ? fan(d, 'dv') : ''}${o.knights ? `<span class="kn">⚔️ ${o.knights}</span>` : ''}</div>`;
+      ${badges}${n ? fan(n, '') : '<span class="kn">0 kort</span>'}${d ? fan(d, 'dv') : ''}</div>`;
   }).join('');
 }
 export let bannerTimer, gainTimer;
@@ -87,6 +95,15 @@ export function playStateSounds(prev, s) {
     if (k) { Sound.play(k, d); d += 0.15; }
   });
   if (s.turn === app.me && prev.turn !== s.turn && s.phase === 'roll') Sound.play('horn', 0.25);
+  // Røveren kommer: stor besked midt på skærmen + lyd (efter terningerne er landet)
+  const rolled7 = (s.rollCount || 0) !== (prev.rollCount || 0) && s.dice && s.dice[0] + s.dice[1] === 7;
+  const knight = s.phase === 'robber' && prev.phase === 'main';
+  if (rolled7 || knight) {
+    const who = esc(s.players[s.turn].name);
+    const text = rolled7 ? `${who} slog 7 og flytter røveren.` + (s.phase === 'discard' ? '<br>Alle med mere end 7 kort skal smide halvdelen.' : '') : `${who} spillede et ridderkort og flytter røveren.`;
+    showEvent('🦹 Røveren kommer!', text + '<br><span style="font-size:.85em">Feltet, røveren står på, giver ingen råstoffer.</span>', true, rolled7 ? 1500 : 100);
+    Sound.play('robber', rolled7 ? 1.5 : 0.1);
+  }
   if ((prev.turn !== s.turn || (prev.phase === 'setup' && s.phase === 'roll')) && s.phase !== 'gameover') showTurnBanner(s);
   showGains(prev, s, (s.rollCount || 0) !== (prev.rollCount || 0) ? 1600 : 150);
   if (s.lastEvent && s.lastEvent.seq === s.seq) { const E = G.EVENTS[s.lastEvent.ev]; showEvent('📯 ' + E.name, E.text, false, 1500); }

@@ -194,3 +194,13 @@ img.art.res-ore { filter: drop-shadow(0 0 2px var(--res-ore)); }
 #tradePopup .swap .arrow { font-size: 26px; }
 #tradePopup .btns { display: flex; gap: 10px; justify-content: center; }
 @keyframes popIn { from { opacity: 0; transform: translate(-50%, -46%) scale(.92); } }
+
+/* ---- Point, Længste vej og Største hær ved hver spiller ---- */
+.opp { flex-wrap: wrap; }
+.opp .badges { display: flex; gap: 4px; align-items: center; }
+.opp .badges span { font-family: 'Cinzel', serif; font-weight: 700; font-size: 12px; color: #fbeccb; padding: 2px 7px; border-radius: 10px; background: rgba(255,255,255,.08); border: 1px solid rgba(201,162,74,.35); white-space: nowrap; }
+.opp .badges .vpb { background: linear-gradient(180deg, #e9c25a, #a67b25); color: #2d2116; border-color: #6b4a14; font-size: 13px; }
+.opp .badges .vpb small { font-size: 10px; opacity: .7; }
+.opp .badges .rb.own { background: linear-gradient(180deg, #c84d3a, #7d1d14); border-color: #e9c25a; box-shadow: 0 0 6px rgba(233,194,90,.6); }
+.opp.me { border-color: rgba(233,194,90,.8); }
+.opp .muted2 { font-size: 10px; opacity: .7; }
