@@ -16,6 +16,7 @@ export const TILE_IMAGES = {
   wheat: inline(IMG + 'tiles/wheat.webp'),   // kornmark
   ore: inline(IMG + 'tiles/ore.webp'),       // bjerge (bruges også tonet i guld til guldfelter)
   desert: inline(IMG + 'tiles/desert.webp'), // ørken
+  gold: inline(IMG + 'tiles/gold.webp'),     // guldfelt (Søfarere)
 };
 
 // Små billeder på råstofkortene (hånden, byggeknapperne, handel og havneskilte)

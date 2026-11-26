@@ -2,7 +2,7 @@
 // Metoderne blandes ind i Board3D (se board3d.js), så `this` er selve brættet.
 import * as THREE from 'three';
 import { K } from './constants.js';
-import { paintPasture, paintGold } from './textures.js';
+import { paintPasture } from './textures.js';
 import { TILE_IMAGES } from '../assets.js';
 
 export class TileParts {
@@ -82,7 +82,7 @@ export class TileParts {
     if (this._tmats[terrain]) return this._tmats[terrain];
     const key = { forest: 'wood', hills: 'brick', fields: 'wheat', mountains: 'ore', desert: 'desert', pasture: 'sheep' }[terrain];
     let tex;
-    if (terrain === 'gold') tex = paintGold(TILE_IMAGES.ore);
+    if (terrain === 'gold') tex = new THREE.TextureLoader().load(TILE_IMAGES.gold);
     else if (key && TILE_IMAGES[key]) { tex = new THREE.TextureLoader().load(TILE_IMAGES[key]); }
     else tex = new THREE.CanvasTexture(paintPasture());
     tex.colorSpace = THREE.SRGBColorSpace;
