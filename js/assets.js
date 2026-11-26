@@ -34,17 +34,13 @@ export const SEA_IMAGE = inline(IMG + 'sea.webp');
 export const MUSIC_FILE = inline('assets/audio/the-old-tower-inn.mp3'); // baggrundsmusik
 export const TABLE_IMAGE = inline(IMG + 'table.webp'); // bordpladen (sømløs, gentages)
 
-// Havnebillederne. Hver råstofhavn har sit eget motiv, og 3:1-havnene skiftes mellem dem.
-// HARBOR_ASPECT er billedernes højde delt med bredde (bruges til at placere dem rigtigt).
-export const HARBOR_IMAGES = [
-  inline(IMG + 'ports/harbor-1.webp'), // fyrtårn ved klipperne → malm
-  inline(IMG + 'ports/harbor-2.webp'), // marked ved byporten  → uld
-  inline(IMG + 'ports/harbor-3.webp'), // borg                 → ler
-  inline(IMG + 'ports/harbor-4.webp'), // skibsværft           → træ
-  inline(IMG + 'ports/harbor-5.webp'), // kirkeby med torv     → korn
-];
-export const HARBOR_ASPECT = [0.6578, 0.6672, 0.8, 0.7875, 0.825];
-export const HARBOR_FOR = { ore: 0, sheep: 1, brick: 2, wood: 3, wheat: 4 };
+// Havnene: en lille kaj med skilt, der viser råstof og byttekurs ('any' = 3:1).
+// Billederne står oprejst ved kysten (de drejes ikke). HARBOR_ASPECT = højde ÷ bredde.
+export const HARBOR_IMAGES = {
+  wood: inline(IMG + 'ports/wood.webp'), brick: inline(IMG + 'ports/brick.webp'), sheep: inline(IMG + 'ports/sheep.webp'),
+  wheat: inline(IMG + 'ports/wheat.webp'), ore: inline(IMG + 'ports/ore.webp'), any: inline(IMG + 'ports/any.webp'),
+};
+export const HARBOR_ASPECT = 406 / 477;
 
 // 3D-modeller af huse og borge (KayKit Medieval Hexagon Pack, CC0) – én pr. spillerfarve
 export const MODEL_DIR = 'assets/models/';
