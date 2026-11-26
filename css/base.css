@@ -7,6 +7,8 @@
 @font-face { font-family: 'Fell'; font-weight: 400; font-style: italic; src: url(../assets/fonts/im-fell-english-400-italic.woff2) format('woff2'); }
 
 :root {
+  /* Råstoffernes farver (som i originalspillet) – bruges på kort, ikoner og havne */
+  --res-wood: #2e6b2c; --res-brick: #b5442a; --res-sheep: #8cc63f; --res-wheat: #e8b81f; --res-ore: #7f8891;
   --parch: #f3e6c8; --parch2: #e8d4a8; --ink: #2d2116; --muted: #6e5a40; --line: #c9ad7a;
   --wood: #5b3a1e; --wood2: #7a5230; --gold: #c9a24a; --wax: #8f2a1e; --wax2: #6e1d14; --ok: #3d6b34;
   --paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .12 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");

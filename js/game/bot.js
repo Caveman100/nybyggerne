@@ -28,7 +28,7 @@ import { totalVP, publicVP } from './scoring.js';
 
 export const BOT_LEVELS = { easy: 'Let', normal: 'Normal', hard: 'Svær' };
 export const BOT_NAMES = ['🤖 Bjarke', '🤖 Gunhild', '🤖 Torvald', '🤖 Ingrid'];
-const OFFER_WAIT_MS = 15000;   // så længe venter botten på svar på et byttetilbud
+const OFFER_WAIT_MS = 20000;   // så længe venter botten på svar på et byttetilbud
 const DEV_RUSH_VP = 3;         // køb udviklingskort, når der mangler højst så mange point
 
 // ---------------------------------------------------------------- værdier

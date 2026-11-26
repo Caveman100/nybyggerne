@@ -2,6 +2,7 @@
 // render() kaldes hver gang tilstanden ændrer sig.
 
 import G from '../game/index.js';
+import { Sound } from '../sound.js';
 
 import { playStateSounds, renderHud } from './hud.js';
 import { expNames } from './lobby.js';
@@ -104,7 +105,8 @@ export function renderSide(s) {
     <div class="muted">Dine byttekurser med banken:</div><div class="row" style="gap:10px;margin-top:6px">${RES.map(k => `<span title="${G.RES_DA[k]}">${icon(k, true)} ${ratios[k]}:1</span>`).join('')}</div>`;
   const incoming = s.trade && s.trade.from !== me && s.phase === 'main';
   document.querySelector('[data-arg="trade"] .dot').hidden = !(incoming && !s.trade.accepted.includes(me) && !s.trade.declined.includes(me));
-  if (incoming && app.ui.seenTrade !== s.trade.id) { app.ui.seenTrade = s.trade.id; openPanel('trade', true); }
+  if (incoming && app.ui.seenTrade !== s.trade.id) { app.ui.seenTrade = s.trade.id; openPanel('trade', true); Sound.play('chime'); Sound.play('paper', 0.15); }
+  renderTradePopup(s, incoming);
   $('legend').innerHTML = legendHtml();
 
   $('players').innerHTML = s.players.map((pl, i) => {
@@ -144,4 +146,21 @@ export function render() {
   if (app.board) app.board.update(s, { highlights: highlights(s), me: app.me });
   renderHud(s);
   renderSide(s); renderModal(s);
+}
+
+// Byttetilbud fra en anden spiller vises midt på skærmen, indtil man har svaret
+function renderTradePopup(s, incoming) {
+  const el = $('tradePopup'), me = app.me, tr = s.trade;
+  const open = incoming && !tr.accepted.includes(me) && !tr.declined.includes(me);
+  if (!open) { el.hidden = true; el.dataset.id = ''; return; }
+  if (el.dataset.id === String(tr.id) && !el.hidden) return; // allerede vist
+  el.dataset.id = tr.id;
+  const p = s.players[me], ok = RES.every(k => p.res[k] >= tr.get[k]);
+  const cards = r => RES.flatMap(k => Array(r[k] || 0).fill(icon(k, true))).join('');
+  el.innerHTML = `<h3>🤝 ${pname(tr.from)} vil bytte</h3>
+    <div class="swap"><div class="side"><span class="muted">Du får</span><div class="cards">${cards(tr.give)}</div></div>
+    <span class="arrow">⇄</span><div class="side"><span class="muted">Du giver</span><div class="cards">${cards(tr.get)}</div></div></div>
+    ${ok ? '' : '<div class="muted" style="margin-bottom:8px">Du har ikke de kort, der bedes om.</div>'}
+    <div class="btns"><button class="primary" data-cmd="accept" ${ok ? '' : 'disabled'}>Accepter</button><button data-cmd="decline">Afslå</button></div>`;
+  el.hidden = false;
 }

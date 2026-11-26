@@ -2,12 +2,14 @@ import { MUSIC_FILE } from './assets.js';
 // Nybyggerne – syntetiske lydeffekter (Web Audio, ingen lydfiler)
 let ac = null, master = null, sfx = null, amb = null, noiseBuf = null, ambientStarted = false, birdTimer = null;
 let muted = false;
+let volume = 0.8; // 0–1, styres af skyderen ved lyd-knappen
+try { const v = localStorage.getItem('nyb-volume'); if (v !== null) volume = +v; } catch (e) {}
 try { muted = localStorage.getItem('nyb-muted') === '1'; } catch (e) {}
 
 function ctx() {
   if (!ac) {
     ac = new (window.AudioContext || window.webkitAudioContext)();
-    master = ac.createGain(); master.gain.value = muted ? 0 : 0.9; master.connect(ac.destination);
+    master = ac.createGain(); master.gain.value = muted ? 0 : 0.9 * volume; master.connect(ac.destination);
     sfx = ac.createGain(); sfx.gain.value = 1; sfx.connect(master);
     amb = ac.createGain(); amb.gain.value = 0; amb.connect(master);
     const len = ac.sampleRate * 2;
@@ -105,7 +107,7 @@ function startAmbient() {
 const MUSIC_VOLUME = 0.3;
 let music = null;
 function startMusic() {
-  if (!music) { music = new Audio(MUSIC_FILE); music.loop = true; music.volume = MUSIC_VOLUME; }
+  if (!music) { music = new Audio(MUSIC_FILE); music.loop = true; music.volume = MUSIC_VOLUME * volume; }
   if (!muted && music.paused) music.play().catch(() => {});
 }
 
@@ -116,7 +118,14 @@ export const Sound = {
     muted = m;
     if (music) { if (m) music.pause(); else music.play().catch(() => {}); }
     try { localStorage.setItem('nyb-muted', m ? '1' : '0'); } catch (e) {}
-    if (master) master.gain.setTargetAtTime(m ? 0 : 0.9, ac.currentTime, 0.05);
+    if (master) master.gain.setTargetAtTime(m ? 0 : 0.9 * volume, ac.currentTime, 0.05);
+  },
+  get volume() { return volume; },
+  setVolume(v) {
+    volume = Math.max(0, Math.min(1, v));
+    try { localStorage.setItem('nyb-volume', String(volume)); } catch (e) {}
+    if (music) music.volume = MUSIC_VOLUME * volume;
+    if (master && !muted) master.gain.setTargetAtTime(0.9 * volume, ac.currentTime, 0.05);
   },
   play(name, delay = 0) {
     if (muted || !SFX[name]) return;

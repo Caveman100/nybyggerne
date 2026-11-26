@@ -15,7 +15,7 @@ export const pname = i => { const p = app.state && app.state.players[i]; return 
 export const shade = c => (c === '#e0b52c' ? '#a07a0c' : c);
 export const fmtLog = m => esc(m).replace(/\[\[(\d)\]\]/g, (_, i) => pname(+i));
 export const icon = (k, small) => {
-  if (CARD_IMAGES[k]) return `<img class="art${small ? ' sm' : ''}" src="${CARD_IMAGES[k]}" alt="${G.RES_DA[k]}">`;
+  if (CARD_IMAGES[k]) return `<img class="art res-${k}${small ? ' sm' : ''}" src="${CARD_IMAGES[k]}" alt="${G.RES_DA[k]}">`;
 
   return `<span class="em">${G.RES_ICON[k]}</span>`;
 };

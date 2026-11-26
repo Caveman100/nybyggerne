@@ -49,7 +49,8 @@
     <button class="tool" data-cmd="panel" data-arg="log" title="Krønike">📜<span>Krønike</span></button>
     <button class="tool" data-cmd="panel" data-arg="settings" title="Indstillinger">⚙️<span>Indstillinger</span></button>
     <button class="tool" data-cmd="rules" title="Regelbog">📖<span>Regler</span></button>
-    <button class="tool" data-cmd="mute" id="muteBtn" title="Lyd til/fra">🔊<span>Lyd</span></button>
+    <div id="soundBox"><button class="tool" data-cmd="mute" id="muteBtn" title="Lyd til/fra">🔊<span>Lyd</span></button>
+      <div id="volBox" class="parch"><span>🔈</span><input type="range" id="volume" min="0" max="100" step="5" title="Lydstyrke"><span>🔊</span></div></div>
   </nav>
   <section class="win parch" id="win-trade" hidden><header>🤝 Handel<button class="x" data-cmd="panel" data-arg="trade">✕</button></header><div class="wb"><div id="tradeBox"></div></div></section>
   <section class="win parch" id="win-players" hidden><header>👥 Spillere<button class="x" data-cmd="panel" data-arg="players">✕</button></header><div class="wb"><details class="lg"><summary>Hvad betyder tallene?</summary><div id="legend" class="legend"></div></details><div id="players"></div></div></section>
@@ -122,12 +123,22 @@
 <div id="rules" hidden><div class="book parch"><header><span>📖 Regelbog</span><button class="x" data-cmd="rules">✕</button></header>
   <nav class="tabs" id="rulesTabs"></nav><div class="page" id="rulesPage"></div></div></div>
 <div id="modal" hidden></div>
+<div id="tradePopup" class="parch" hidden></div>
 <div id="toast" hidden></div>
 <div id="banner" hidden></div>
 
 <!-- PeerJS: forbinder spillernes browsere direkte med hinanden (ingen egen server) -->
 <script src="vendor/peerjs.min.js"></script>
 <!-- Selve spillet. Starter i js/main.js -->
+<script>
+  // Hent altid nyeste filer (se sw.js). Første gang efter installation genindlæses siden én gang.
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    const fresh = !navigator.serviceWorker.controller;
+    navigator.serviceWorker.register('sw.js').then(() => navigator.serviceWorker.ready).then(() => {
+      if (fresh && !sessionStorage.getItem('nyb-sw')) { sessionStorage.setItem('nyb-sw', '1'); location.reload(); }
+    }).catch(() => {});
+  }
+</script>
 <script type="module" src="js/main.js"></script>
 <script>
   // Åbnet direkte som fil? Så kan browseren ikke indlæse modulerne – forklar hvad man skal gøre.

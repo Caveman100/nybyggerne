@@ -4,6 +4,9 @@ import * as THREE from 'three';
 import { K } from './constants.js';
 import { CARD_IMAGES, HARBOR_IMAGES, HARBOR_ASPECT, HARBOR_FOR } from '../assets.js';
 
+// Råstoffernes farver (samme som --res-* i css/base.css)
+const RES_COLOR = { wood: '#2e6b2c', brick: '#b5442a', sheep: '#7fb832', wheat: '#e0ac12', ore: '#6f7882', any: '#6b4a2a' };
+
 export class HarborParts {
   _makePort(pt) {
     const G = this.G;
@@ -34,7 +37,7 @@ export class HarborParts {
     // Symbolet står altid oprejst nede ved kajen
     const dist = PH * 0.24;                        // nede over vandet/kajen, så motivet ses
     const disc = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: this._portBadge(pt.type), transparent: true, alphaTest: 0.05, toneMapped: false }));
-    const ds = PW * 0.38;
+    const ds = PW * 0.72;
     disc.scale.set(ds, ds, 1);
     disc.rotation.x = -Math.PI / 2;
     disc.position.set(mx + d.x * dist, 0.01, mz + d.y * dist);
@@ -71,15 +74,18 @@ export class HarborParts {
       gr.addColorStop(0, '#f6e7c4'); gr.addColorStop(1, '#d6bd8a');
       x.fillStyle = gr; x.beginPath(); x.arc(c, c, R, 0, Math.PI * 2); x.fill();
       x.restore();
-      x.lineWidth = 9; x.strokeStyle = '#5a3a1e'; x.beginPath(); x.arc(c, c, R - 4, 0, Math.PI * 2); x.stroke();
-      x.lineWidth = 2.5; x.strokeStyle = '#c9a24e'; x.beginPath(); x.arc(c, c, R - 12, 0, Math.PI * 2); x.stroke();
+      // Tyk ring i råstoffets farve, så man kan se havnens råstof på lang afstand
+      x.lineWidth = 22; x.strokeStyle = RES_COLOR[type]; x.beginPath(); x.arc(c, c, R - 11, 0, Math.PI * 2); x.stroke();
+      x.lineWidth = 4; x.strokeStyle = '#3a2210'; x.beginPath(); x.arc(c, c, R - 1, 0, Math.PI * 2); x.stroke();
+
       const txt = type === 'any' ? '3:1' : '2:1';
       x.textAlign = 'center'; x.textBaseline = 'middle';
       if (img) {
-        const h = S * 0.5, w = h * img.width / img.height;
-        x.drawImage(img, c - w / 2, c - h / 2 - 22, w, h);
-        x.font = `700 ${Math.round(S * 0.2)}px Cinzel, Georgia, serif`;
-        x.fillStyle = '#3a2210'; x.fillText(txt, c, c + S * 0.27);
+        const h = S * 0.52, w = h * img.width / img.height;
+        x.drawImage(img, c - w / 2, c - h / 2 - 26, w, h);
+        x.fillStyle = RES_COLOR[type]; x.fillRect(c - S * 0.22, c + S * 0.16, S * 0.44, S * 0.2);
+        x.font = `700 ${Math.round(S * 0.17)}px Cinzel, Georgia, serif`;
+        x.fillStyle = '#fff'; x.fillText(txt, c, c + S * 0.265);
       } else if (type === 'any') {
         x.font = `700 ${Math.round(S * 0.3)}px Cinzel, Georgia, serif`;
         x.fillStyle = '#3a2210'; x.fillText(txt, c, c - 8);

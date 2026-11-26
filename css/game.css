@@ -161,3 +161,36 @@ details.lg .legend { margin-top: 6px; }
 .tool { background: rgba(30, 18, 8, .38) !important; border: 1px solid rgba(201, 162, 74, .55) !important; box-shadow: 0 2px 8px rgba(0, 0, 0, .25) !important; backdrop-filter: blur(2px); }
 .tool:hover:not(:disabled) { background: rgba(60, 38, 18, .55) !important; }
 .tool.on { background: rgba(201, 162, 74, .55) !important; }
+
+/* ---- Råstoffer i farver ---- */
+.hc.res-wood { background: linear-gradient(180deg, #d9ecd3, #9cc78f); border-color: var(--res-wood); }
+.hc.res-brick { background: linear-gradient(180deg, #f6d6c9, #e0937a); border-color: var(--res-brick); }
+.hc.res-sheep { background: linear-gradient(180deg, #ecf7d9, #bfe08c); border-color: #5f9a22; }
+.hc.res-wheat { background: linear-gradient(180deg, #fff3c7, #f0cf62); border-color: #b48a0c; }
+.hc.res-ore { background: linear-gradient(180deg, #eceff2, #b3bac1); border-color: #555d66; }
+.hc[class*="res-"] { border-width: 3px; }
+img.art.res-wood { filter: drop-shadow(0 0 0 var(--res-wood)) drop-shadow(0 0 2px var(--res-wood)); }
+img.art.res-brick { filter: drop-shadow(0 0 2px var(--res-brick)); }
+img.art.res-sheep { filter: drop-shadow(0 0 2px var(--res-sheep)); }
+img.art.res-wheat { filter: drop-shadow(0 0 2px var(--res-wheat)); }
+img.art.res-ore { filter: drop-shadow(0 0 2px var(--res-ore)); }
+
+/* ---- Lydstyrke ved lyd-knappen ---- */
+#soundBox { position: relative; display: flex; justify-content: flex-end; }
+#volBox { position: absolute; right: calc(100% + 6px); top: 50%; transform: translateY(-50%); display: none; align-items: center; gap: 6px;
+  padding: 8px 12px; border-radius: 22px; border: 1px solid #8a6a33; box-shadow: 0 4px 14px rgba(0,0,0,.45); white-space: nowrap; }
+#soundBox:hover #volBox, #volBox:focus-within { display: flex; }
+#volBox::after { content: ''; position: absolute; left: 100%; top: 0; width: 10px; height: 100%; } /* bro, så musen kan nå skyderen */
+#volume { width: 120px; padding: 0; accent-color: #a67b25; }
+
+/* ---- Byttetilbud midt på skærmen ---- */
+#tradePopup { position: fixed; left: 50%; top: 42%; transform: translate(-50%, -50%); z-index: 30; min-width: 320px; max-width: 92vw;
+  padding: 18px 22px; border-radius: 16px; border: 2px solid #8a6a33; box-shadow: 0 20px 60px rgba(0,0,0,.65); text-align: center; animation: popIn .25s ease-out; }
+#tradePopup h3 { margin: 0 0 8px; font-size: 20px; }
+#tradePopup .swap { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 10px 0 14px; font-size: 15px; }
+#tradePopup .swap .side { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+#tradePopup .swap .cards { display: flex; gap: 4px; }
+#tradePopup .swap img { width: 52px !important; height: 58px !important; }
+#tradePopup .swap .arrow { font-size: 26px; }
+#tradePopup .btns { display: flex; gap: 10px; justify-content: center; }
+@keyframes popIn { from { opacity: 0; transform: translate(-50%, -46%) scale(.92); } }

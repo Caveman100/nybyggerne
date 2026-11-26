@@ -12,4 +12,5 @@ package.json
 package-lock.json
 .assetsignore
 .gitignore
+sw.js.bak
 *.md

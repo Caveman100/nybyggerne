@@ -41,7 +41,7 @@ export function renderHud(s) {
       const g = devs[k], playable = k !== 'vp' && canPlay && g.ready > 0;
       return `<div class="hc dev ${playable ? 'play' : g.ready < g.n && k !== 'vp' ? 'wait' : ''}" ${playable ? `data-cmd="play" data-arg="${k}"` : ''} title="${G.DEV_DA[k]}: ${G.DEV_DESC[k]}${playable ? ' – klik for at spille' : ''}"><span class="em">${DI[k]}</span><span class="nm">${G.DEV_DA[k]}</span><span class="cnt">${g.n}</span></div>`;
     }).join('');
-    mh.innerHTML = `<div class="hl">Dine kort</div><div class="row2">${RES.map(k => `<div class="hc ${p.res[k] ? '' : 'zero'}" title="${G.RES_DA[k]}"><img src="${CARD_IMAGES[k]}" alt=""><span class="nm">${G.RES_DA[k]}</span><span class="cnt">${p.res[k]}</span></div>`).join('')}${devHtml ? '<div class="hsep"></div>' + devHtml : ''}</div>`;
+    mh.innerHTML = `<div class="hl">Dine kort</div><div class="row2">${RES.map(k => `<div class="hc res-${k} ${p.res[k] ? '' : 'zero'}" title="${G.RES_DA[k]}"><img src="${CARD_IMAGES[k]}" alt=""><span class="nm">${G.RES_DA[k]}</span><span class="cnt">${p.res[k]}</span></div>`).join('')}${devHtml ? '<div class="hsep"></div>' + devHtml : ''}</div>`;
   }
   const others = [];
   for (let k = 1; k < s.players.length; k++) others.push((me + k) % s.players.length);
