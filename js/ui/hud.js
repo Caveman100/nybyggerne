@@ -119,6 +119,9 @@ export function layoutLeft() {
   sb.style.top = y + 'px';
   if (!$('hudLayer').hidden) y += sb.offsetHeight + 12;
   if (!oh.hidden) { oh.style.top = y + 'px'; y += oh.offsetHeight + 10; }
+  const tw = $('win-trade');
+  if (tw.classList.contains('docked') && !tw.hidden) { tw.style.top = y + 'px'; tw.style.maxHeight = `calc(100vh - ${y + 190}px)`; y += tw.offsetHeight + 10; }
+  else tw.style.top = '';
   bb.style.top = y + 'px';
 }
 setInterval(layoutLeft, 200);

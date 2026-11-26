@@ -142,3 +142,22 @@ details.lg .legend { margin-top: 6px; }
 .bi.idle { cursor: default; }
 .bi.idle:disabled { opacity: .8; filter: saturate(.75); }
 #myHand { bottom: 10px; }
+
+/* Handel: på store skærme altid fremme i venstre side, diskret og gennemsigtig */
+@media (min-width: 861px) {
+  .win.docked { left: 10px; right: auto; width: 290px; animation: none; background: rgba(30, 18, 8, .5) !important; border: 1px solid rgba(201, 162, 74, .45);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .35); opacity: .82; transition: opacity .2s; color: #f3e6c8; font-size: 14px; }
+  .win.docked:hover, .win.docked:focus-within { opacity: 1; }
+  .win.docked header { font-size: 13px; padding: 5px 10px; background: rgba(60, 38, 18, .6); border-bottom: 1px solid rgba(201, 162, 74, .45); }
+  .win.docked header .x { display: none; }
+  .win.docked .wb { padding: 8px 10px 10px; }
+  .win.docked .muted, .win.docked .cz, .win.docked b { color: #e9d6ac; }
+  .win.docked select, .win.docked button { font-size: 12px; padding: 3px 6px; }
+  .win.docked img { width: 22px !important; height: 24px !important; margin: 0 !important; vertical-align: middle; }
+  .win.docked .row { flex-wrap: wrap; }
+  .tool[data-arg="trade"] { display: none; }   /* knappen er overflødig, når handel altid er fremme */
+}
+/* Værktøjsknapperne i højre side: gennemsigtige */
+.tool { background: rgba(30, 18, 8, .38) !important; border: 1px solid rgba(201, 162, 74, .55) !important; box-shadow: 0 2px 8px rgba(0, 0, 0, .25) !important; backdrop-filter: blur(2px); }
+.tool:hover:not(:disabled) { background: rgba(60, 38, 18, .55) !important; }
+.tool.on { background: rgba(201, 162, 74, .55) !important; }

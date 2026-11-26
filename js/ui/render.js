@@ -99,6 +99,7 @@ export function renderSide(s) {
   // Handel
   const tr = renderTrade(s);
   const ratios = G.tradeRatios(s, me);
+  if (window.innerWidth > 860 && $('win-trade').hidden) openPanel(app.ui.panel, true);
   $('tradeBox').innerHTML = tr || `<p class="muted" style="margin-top:0;font-style:italic">Du kan handle, når det er din tur og terningerne er kastet. Andres tilbud dukker op her.</p>
     <div class="muted">Dine byttekurser med banken:</div><div class="row" style="gap:10px;margin-top:6px">${RES.map(k => `<span title="${G.RES_DA[k]}">${icon(k, true)} ${ratios[k]}:1</span>`).join('')}</div>`;
   const incoming = s.trade && s.trade.from !== me && s.phase === 'main';

@@ -8,7 +8,10 @@ import { $, RES, esc, icon, pname, resLine } from './util.js';
 export function openPanel(name, force) {
   const cur = app.ui.panel;
   app.ui.panel = !force && cur === name ? null : name;
-  ['trade', 'players', 'log', 'settings'].forEach(n => { $('win-' + n).hidden = app.ui.panel !== n; });
+  const docked = window.innerWidth > 860 && !!app.state; // på store skærme står handel altid fremme i venstre side
+  if (docked && name === 'trade') app.ui.panel = null;
+  ['trade', 'players', 'log', 'settings'].forEach(n => { $('win-' + n).hidden = app.ui.panel !== n && !(n === 'trade' && docked); });
+  $('win-trade').classList.toggle('docked', docked);
   document.querySelectorAll('.tool[data-cmd="panel"]').forEach(b => b.classList.toggle('on', b.dataset.arg === app.ui.panel));
 }
 export const TIPS = {
