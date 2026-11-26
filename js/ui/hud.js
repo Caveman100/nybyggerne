@@ -130,15 +130,25 @@ setInterval(() => {
 export function layoutLeft() {
   const wide = window.innerWidth > 860;
   const sb = $('statusBar'), tm = $('timer'), oh = $('oppHud'), bb = $('barbHud'), ct = $('codeTag');
-  if (!wide) { [sb, tm, oh, bb].forEach(e => e.style.top = ''); return; }
+  if (!wide) { [sb, tm, oh, bb, $('toolbar')].forEach(e => e.style.top = ''); if (app.board && app.board.diceAnchor) app.board.setDiceAnchor(null); return; }
   let y = ct.hidden ? 10 : ct.offsetTop + ct.offsetHeight + 8;
   if (!tm.hidden) { tm.style.top = y + 'px'; y += tm.offsetHeight + 8; }
   sb.style.top = y + 'px';
   if (!$('hudLayer').hidden) y += sb.offsetHeight + 12;
   if (!oh.hidden) { oh.style.top = y + 'px'; y += oh.offsetHeight + 10; }
-  const tw = $('win-trade');
-  if (tw.classList.contains('docked') && !tw.hidden) { tw.style.top = y + 'px'; tw.style.maxHeight = `calc(100vh - ${y + 190}px)`; y += tw.offsetHeight + 10; }
-  else tw.style.top = '';
+  // Terningebakken står i venstre kolonne under spillerne
+  if (app.board && app.board.setDiceAnchor) {
+    const want = { x: 10, y, w: 200 };
+    const cur = app.board.diceAnchor;
+    if (!cur || cur.y !== want.y) app.board.setDiceAnchor(want);
+    y += 100 + 10;
+  }
+  // Handel står øverst til højre; værktøjsknapperne under den
+  const tw = $('win-trade'), tb = $('toolbar');
+  if (tw.classList.contains('docked') && !tw.hidden) {
+    tw.style.top = '10px'; tw.style.maxHeight = 'calc(100vh - 330px)';
+    tb.style.top = (10 + tw.offsetHeight + 12) + 'px';
+  } else { tw.style.top = ''; tb.style.top = ''; }
   bb.style.top = y + 'px';
 }
 setInterval(layoutLeft, 200);

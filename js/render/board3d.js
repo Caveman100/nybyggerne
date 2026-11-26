@@ -382,8 +382,12 @@ export class Board3D {
     if (this._placeDiceTray) this._placeDiceTray();
   }
 
+  // Skærmen kan placere terningebakken et bestemt sted (x, y i pixels); ellers øverst til højre
+  setDiceAnchor(a) { this.diceAnchor = a; if (this._placeDiceTray) this._placeDiceTray(); }
+
   diceRect() {
     if (!this.size) return null;
+    if (this.diceAnchor) return { x: this.diceAnchor.x, y: this.diceAnchor.y, w: this.diceAnchor.w, h: Math.round(this.diceAnchor.w * 0.5), below: true };
     const { w, h } = this.size;
     const dw = Math.round(Math.min(180, Math.max(118, w * 0.16))), dh = Math.round(dw * 0.62);
     if (w / h < 1) return { x: w - dw - 8, y: 8, w: dw, h: dh, below: true };
