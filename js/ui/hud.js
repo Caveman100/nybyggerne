@@ -136,12 +136,12 @@ export function layoutLeft() {
   sb.style.top = y + 'px';
   if (!$('hudLayer').hidden) y += sb.offsetHeight + 12;
   if (!oh.hidden) { oh.style.top = y + 'px'; y += oh.offsetHeight + 10; }
-  // Terningebakken står i venstre kolonne under spillerne
+  // Terningebakken står lige over dine kort nederst til venstre
   if (app.board && app.board.setDiceAnchor) {
-    const want = { x: 10, y, w: 200 };
+    const mh = $('myHand'), top = mh.hidden ? window.innerHeight - 20 : mh.getBoundingClientRect().top;
+    const want = { x: 10, y: Math.round(top - 100 - 40), w: 200 };
     const cur = app.board.diceAnchor;
     if (!cur || cur.y !== want.y) app.board.setDiceAnchor(want);
-    y += 100 + 10;
   }
   // Handel står øverst til højre; værktøjsknapperne under den
   const tw = $('win-trade'), tb = $('toolbar');

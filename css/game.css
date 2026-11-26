@@ -206,3 +206,52 @@ img.art.res-ore { filter: drop-shadow(0 0 2px var(--res-ore)); }
 .opp .badges .rb.own { background: linear-gradient(180deg, #c84d3a, #7d1d14); border-color: #e9c25a; box-shadow: 0 0 6px rgba(233,194,90,.6); }
 .opp.me { border-color: rgba(233,194,90,.8); }
 .opp .muted2 { font-size: 10px; opacity: .7; }
+
+/* ================= Middelalder-knapper og -menuer ================= */
+button { background: linear-gradient(180deg, #6e2219, #4a1510) !important; border: 1px solid #b8964f !important; border-radius: 4px !important;
+  color: #f3e1b4 !important; text-shadow: 0 1px 2px rgba(0,0,0,.7) !important; letter-spacing: .04em;
+  box-shadow: inset 0 0 14px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,220,160,.18), 0 2px 6px rgba(0,0,0,.45) !important;
+  background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.025) 0 6px, transparent 6px 12px), linear-gradient(180deg, #6e2219, #4a1510) !important; }
+button:hover:not(:disabled) { filter: brightness(1.15); border-color: #e0c27a !important; }
+button.primary { background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.03) 0 6px, transparent 6px 12px), linear-gradient(180deg, #8a2a1c, #5a170f) !important; }
+button.on { background-image: linear-gradient(180deg, #c9a24a, #8a6a26) !important; color: #2d2116 !important; text-shadow: none !important; }
+.tool { border-radius: 50% !important; }
+.card.parch, .win, #lobbyCard, .startBox .card, #modal .box, #tradePopup {
+  background: radial-gradient(ellipse at 50% 30%, #2b1d14, #17100b 80%) !important; color: #f0dcae !important;
+  border: 1px solid #b8964f !important; border-radius: 6px !important; box-shadow: inset 0 0 30px rgba(0,0,0,.7), 0 10px 30px rgba(0,0,0,.6) !important; }
+.card.parch h2, #lobbyCard h2, #modal h2, #tradePopup h3 { color: #f0d9a0 !important; }
+.muted { color: #c9b38a !important; }
+input, select { background: #1e140d !important; color: #f0dcae !important; border: 1px solid #8a6a33 !important; border-radius: 4px !important; box-shadow: inset 0 0 8px rgba(0,0,0,.6); }
+#buildBar { background: radial-gradient(ellipse at 50% 30%, #2b1d14, #17100b) !important; border: 1px solid #b8964f !important; border-radius: 6px !important; }
+.bi { background: linear-gradient(180deg, #3a2618, #24170f) !important; color: #f0dcae !important; border: 1px solid #8a6a33 !important; border-radius: 4px !important;
+  box-shadow: inset 0 0 12px rgba(0,0,0,.6) !important; }
+.bi .t, .bi .n { color: #f0dcae !important; }
+
+/* ================= Handel: mindre og tydeligere ================= */
+@media (min-width: 861px) {
+  .win.docked { width: 290px !important; font-size: 13px; }
+  .win.docked .wb { padding: 8px; }
+  .win.docked header { font-size: 14px; padding: 6px 10px; }
+  .win.docked img { width: 26px !important; height: 29px !important; }
+}
+.tradeGrid { grid-template-columns: auto 1fr 1fr !important; gap: 3px 4px !important; }
+.tradeGrid .th { text-align: center; font-size: 11px !important; padding: 3px 0; border-radius: 3px; }
+.tradeGrid .th.give { background: rgba(190, 60, 40, .35); color: #ffd2c2 !important; }
+.tradeGrid .th.get { background: rgba(70, 150, 70, .35); color: #d4f5c6 !important; }
+.tradeGrid .cell { border-radius: 3px; padding: 1px; display: flex; justify-content: center; }
+.tradeGrid .cell.give { background: rgba(190, 60, 40, .15); }
+.tradeGrid .cell.get { background: rgba(70, 150, 70, .15); }
+.tradeGrid .stepper { gap: 2px; }
+.tradeGrid .stepper button { padding: 0 6px !important; font-size: 12px !important; min-width: 0; }
+.tradeGrid .stepper b { min-width: 16px; text-align: center; }
+.resTag { display: flex; align-items: center; gap: 4px; padding: 1px 6px 1px 2px; border-radius: 4px; border-left: 4px solid; }
+.resTag small { font-size: 11px; color: #f0dcae; }
+.resTag.res-wood { border-color: var(--res-wood); background: rgba(46,107,44,.35); }
+.resTag.res-brick { border-color: var(--res-brick); background: rgba(181,68,42,.35); }
+.resTag.res-sheep { border-color: var(--res-sheep); background: rgba(140,198,63,.3); }
+.resTag.res-wheat { border-color: var(--res-wheat); background: rgba(232,184,31,.3); }
+.resTag.res-ore { border-color: var(--res-ore); background: rgba(127,136,145,.35); }
+#status, #status.mine { background: radial-gradient(ellipse at 50% 30%, #3a2618, #1c130c 85%) !important; color: #f3e1b4 !important;
+  border: 1px solid #b8964f !important; border-radius: 6px !important; box-shadow: inset 0 0 18px rgba(0,0,0,.7), 0 4px 12px rgba(0,0,0,.45) !important; }
+#status.mine { border-color: #e9c25a !important; box-shadow: inset 0 0 18px rgba(0,0,0,.7), 0 0 10px rgba(233,194,90,.45) !important; }
+.opp, #myHand, #localSwitch, #diceSum, #codeTag { border-radius: 6px !important; box-shadow: inset 0 0 14px rgba(0,0,0,.6), 0 4px 12px rgba(0,0,0,.4) !important; }

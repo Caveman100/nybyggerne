@@ -75,8 +75,8 @@ export function renderTrade(s) {
   const r = ratios[app.ui.bankGive];
   h += `<div class="row" style="margin-bottom:10px"><span class="cz" style="font-size:14px">Bank:</span> giv ${r}× <select data-ui="bankGive">${opt(app.ui.bankGive)}</select> → 1× <select data-ui="bankGet">${opt(app.ui.bankGet)}</select>
         <button data-cmd="bank" ${p.res[app.ui.bankGive] >= r && app.ui.bankGive !== app.ui.bankGet ? '' : 'disabled'}>Byt</button></div>`;
-  h += `<div class="tradeGrid"><span></span><b class="cz" style="font-size:13px">Jeg giver</b><b class="cz" style="font-size:13px">Jeg vil have</b>`;
-  RES.forEach(k => { h += `<span title="${G.RES_DA[k]}">${icon(k, true)}</span>${stepper('give', k)}${stepper('get', k)}`; });
+  h += `<div class="tradeGrid"><span></span><b class="cz th give">⬆ Du giver</b><b class="cz th get">⬇ Du får</b>`;
+  RES.forEach(k => { h += `<span class="resTag res-${k}" title="${G.RES_DA[k]}">${icon(k, true)}<small>${G.RES_DA[k]}</small></span><div class="cell give">${stepper('give', k)}</div><div class="cell get">${stepper('get', k)}</div>`; });
   h += `</div><div class="btns" style="margin-top:8px"><button data-cmd="offer" ${G.countRes(app.ui.give) && G.countRes(app.ui.get) ? '' : 'disabled'}>Send tilbud til de andre</button></div>`;
   return h;
 }
